@@ -102,26 +102,25 @@ const (
    https://priv.example.com/fileSequence2682.ts
 */
 type MediaPlaylist struct {
-	TargetDuration   float64
-	SeqNo            uint64 // EXT-X-MEDIA-SEQUENCE
-	Segments         []*MediaSegment
-	Args             string // optional arguments placed after URIs (URI?Args)
-	Iframe           bool   // EXT-X-I-FRAMES-ONLY
-	Closed           bool   // is this VOD (closed) or Live (sliding) playlist?
-	MediaType        MediaType
-	DiscontinuitySeq uint64 // EXT-X-DISCONTINUITY-SEQUENCE
-	durationAsInt    bool   // output durations as integers of floats?
-	keyformat        int
-	winsize          uint // max number of segments displayed in an encoded playlist; need set to zero for VOD playlists
-	capacity         uint // total capacity of slice used for the playlist
-	head             uint // head of FIFO, we add segments to head
-	tail             uint // tail of FIFO, we remove segments from tail
-	count            uint // number of segments added to the playlist
-	buf              bytes.Buffer
-	ver              uint8
-	Key              *Key // EXT-X-KEY is optional encryption key displayed before any segments (default key for the playlist)
-	Map              *Map // EXT-X-MAP is optional tag specifies how to obtain the Media Initialization Section (default map for the playlist)
-	WV               *WV  // Widevine related tags outside of M3U8 specs
+	TargetDuration float64
+	SeqNo          uint64 // EXT-X-MEDIA-SEQUENCE
+	Segments       []*MediaSegment
+	Args           string // optional arguments placed after URIs (URI?Args)
+	Iframe         bool   // EXT-X-I-FRAMES-ONLY
+	Closed         bool   // is this VOD (closed) or Live (sliding) playlist?
+	MediaType      MediaType
+	durationAsInt  bool // output durations as integers of floats?
+	keyformat      int
+	winsize        uint // max number of segments displayed in an encoded playlist; need set to zero for VOD playlists
+	capacity       uint // total capacity of slice used for the playlist
+	head           uint // head of FIFO, we add segments to head
+	tail           uint // tail of FIFO, we remove segments from tail
+	count          uint // number of segments added to the playlist
+	buf            bytes.Buffer
+	ver            uint8
+	Key            *Key // EXT-X-KEY is optional encryption key displayed before any segments (default key for the playlist)
+	Map            *Map // EXT-X-MAP is optional tag specifies how to obtain the Media Initialization Section (default map for the playlist)
+	WV             *WV  // Widevine related tags outside of M3U8 specs
 }
 
 /*
@@ -158,19 +157,17 @@ type Variant struct {
 // This structure represents additional parameters for a variant
 // used in EXT-X-STREAM-INF and EXT-X-I-FRAME-STREAM-INF
 type VariantParams struct {
-	ProgramId        uint32
-	Bandwidth        uint32
-	AverageBandwidth uint32 // EXT-X-STREAM-INF only
-	Codecs           string
-	Resolution       string
-	Audio            string // EXT-X-STREAM-INF only
-	Video            string
-	Subtitles        string         // EXT-X-STREAM-INF only
-	Captions         string         // EXT-X-STREAM-INF only
-	Name             string         // EXT-X-STREAM-INF only (non standard Wowza/JWPlayer extension to name the variant/quality in UA)
-	FrameRate        float64        // EXT-X-STREAM-INF
-	Iframe           bool           // EXT-X-I-FRAME-STREAM-INF
-	Alternatives     []*Alternative // EXT-X-MEDIA
+	ProgramId    uint32
+	Bandwidth    uint32
+	Codecs       string
+	Resolution   string
+	Audio        string // EXT-X-STREAM-INF only
+	Video        string
+	Subtitles    string         // EXT-X-STREAM-INF only
+	Captions     string         // EXT-X-STREAM-INF only
+	Name         string         // EXT-X-STREAM-INF only (non standard Wowza/JWPlayer extension to name the variant/quality in UA)
+	Iframe       bool           // EXT-X-I-FRAME-STREAM-INF
+	Alternatives []*Alternative // EXT-X-MEDIA
 }
 
 // This structure represents EXT-X-MEDIA tag in variants.
@@ -194,6 +191,7 @@ type MediaSegment struct {
 	SeqId           uint64
 	Title           string // optional second parameter for EXTINF tag
 	URI             string
+	Group           string
 	Duration        float64   // first parameter for EXTINF tag; duration must be integers if protocol version is less than 3 but we are always keep them float
 	Limit           int64     // EXT-X-BYTERANGE <n> is length in bytes for the file under URI
 	Offset          int64     // EXT-X-BYTERANGE [@o] is offset from the start of the file under URI
@@ -285,6 +283,7 @@ type decodingState struct {
 	offset             int64
 	duration           float64
 	title              string
+	group              string
 	variant            *Variant
 	alternatives       []*Alternative
 	xkey               *Key
